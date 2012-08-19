@@ -110,63 +110,68 @@ namespace myXMLParser
                 //While we have not reached the end of the file, 
                 //continue processing/parsing it.
                 //see REFERENCES #1
-                while (reader.Read())
+                try
                 {
-
-                    //If it is an element than determine if it is a child
-                    //or parent and process it appropriately. 
-                    switch (reader.NodeType)
+                    while (reader.Read())
                     {
-                        case XmlNodeType.Element:
+
+                        //Determine if it's a child or parent and process it appropriately. 
+                        switch (reader.NodeType)
                         {
-                            var newNode = new TreeViewItem
-                            {
-                                Header = reader.Name
-                            };
+                                case XmlNodeType.Element:
+                                {
+                                    var newNode = new TreeViewItem
+                                    {
+                                        Header = reader.Name
+                                    };
 
-                            bool Empty = reader.IsEmptyElement;
+                                    bool Empty = reader.IsEmptyElement;
 
-                            //read in the name of the node
-                            newNode.Header = reader.Name;
+                                    //Read in the name of the node
+                                    newNode.Header = reader.Name;
 
-                            //If TreeViewItem created to keep track of the parent
-                            //node is not null than we have a parent node which
-                            //we need to add to our treeview else, we have a child
-                            //node that we need to add to our treeview
-                            if (theParent != null)
-                            {
-                                theParent.Items.Add(newNode);
-                            }
-                            else
-                            {
-                                myTreeView.Items.Add(newNode);
-                            }
+                                    //If TreeViewItem created to keep track of the parent
+                                    //node is not null than we have a parent node which
+                                    //we need to add to our treeview else, we have a child
+                                    //node that we need to add to our treeview
+                                    if (theParent != null)
+                                    {
+                                        theParent.Items.Add(newNode);
+                                    }
+                                    else
+                                    {
+                                        myTreeView.Items.Add(newNode);
+                                    }
 
-                            //if we have an empty elelemnt than we must set
-                            //our parent node to the new node
-                            if (!Empty)
-                            {
-                                theParent = newNode;
-                            }
-                            break;
-                        }
-                        case XmlNodeType.Text:
-                        {
-                            //Add the value of the parent to our tree
-                            theParent.Items.Add(reader.Value);
-                            break;
-                        }
-                        case XmlNodeType.EndElement:
-                        {
-                            //Recognize we have reached the end of the element
-                            //and get TreeViewItem's parent item
-                            if (theParent != null)
-                            {
-                                theParent = theParent.Parent as TreeViewItem;
-                            }
-                            break;
+                                    //Set our parent node to the new node
+                                    if (!Empty)
+                                    {
+                                        theParent = newNode;
+                                    }
+                                    break;
+                                }
+                            case XmlNodeType.Text:
+                                {
+                                    //Add the value of the parent to our tree
+                                    theParent.Items.Add(reader.Value);
+                                    break;
+                                }
+                            case XmlNodeType.EndElement:
+                                {
+                                    //Recognize we have reached the end of the element
+                                    //and get TreeViewItem's parent item
+                                    if (theParent != null)
+                                    {
+                                        theParent = theParent.Parent as TreeViewItem;
+                                    }
+                                    break;
+                                }
                         }
                     }
+                }
+                catch(XmlException ex)
+                {
+                    Console.WriteLine(ex); 
                 }
 
             }
